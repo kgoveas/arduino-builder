@@ -37,6 +37,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"syscall"
 
@@ -77,6 +78,7 @@ const FLAG_LOGGER_HUMAN = "human"
 const FLAG_LOGGER_MACHINE = "machine"
 const FLAG_VERSION = "version"
 const FLAG_VID_PID = "vid-pid"
+const FLAG_JOBS = "jobs"
 
 type foldersFlag []string
 
@@ -133,6 +135,7 @@ var warningsLevelFlag *string
 var loggerFlag *string
 var versionFlag *bool
 var vidPidFlag *string
+var jobsFlag *int
 
 func init() {
 	compileFlag = flag.Bool(FLAG_ACTION_COMPILE, false, "compiles the given sketch")
@@ -155,6 +158,7 @@ func init() {
 	loggerFlag = flag.String(FLAG_LOGGER, FLAG_LOGGER_HUMAN, "Sets type of logger. Available values are '"+FLAG_LOGGER_HUMAN+"', '"+FLAG_LOGGER_MACHINE+"'")
 	versionFlag = flag.Bool(FLAG_VERSION, false, "prints version and exits")
 	vidPidFlag = flag.String(FLAG_VID_PID, "", "specify to use vid/pid specific build properties, as defined in boards.txt")
+	jobsFlag = flag.Int(FLAG_JOBS, 0, "specify how many concurrent gcc processes should run at the same time. Defaults to the number of available cores on the running machine")
 }
 
 func main() {
@@ -167,6 +171,12 @@ func main() {
 		fmt.Println("This is free software; see the source for copying conditions.  There is NO")
 		fmt.Println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
 		return
+	}
+
+	if *jobsFlag > 0 {
+		runtime.GOMAXPROCS(*jobsFlag)
+	} else {
+		runtime.GOMAXPROCS(runtime.NumCPU())
 	}
 
 	ctx := &types.Context{}
