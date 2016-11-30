@@ -86,6 +86,9 @@ type Context struct {
 
 	// ReadFileAndStoreInContext command
 	FileToRead string
+
+	// Max jobs
+	Jobs int
 }
 
 func (ctx *Context) ExtractBuildOptions() properties.Map {
