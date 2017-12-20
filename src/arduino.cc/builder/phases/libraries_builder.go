@@ -79,9 +79,9 @@ func fixLDFLAGforPrecompiledLibraries(ctx *types.Context, libraries []*types.Lib
 	for _, library := range libraries {
 		if library.Precompiled {
 			// add library src path to compiler.c.elf.extra_flags
-			// use library.Name as lib name and srcPath/{mcpu} as location
-			mcu := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
-			path := filepath.Join(library.SrcFolder, mcu)
+			// use library.Name as lib name and srcPath/{build.arch} as location
+			arch := ctx.BuildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH]
+			path := filepath.Join(library.SrcFolder, arch)
 			// find all library names in the folder and prepend -l
 			filePaths := []string{}
 			libs_cmd := library.LDflags + " "
@@ -131,8 +131,8 @@ func compileLibrary(library *types.Library, buildPath string, buildProperties pr
 		extensions := func(ext string) bool { return PRECOMPILED_LIBRARIES_VALID_EXTENSIONS_STATIC[ext] }
 
 		filePaths := []string{}
-		mcu := buildProperties[constants.BUILD_PROPERTIES_BUILD_MCU]
-		err := utils.FindFilesInFolder(&filePaths, filepath.Join(library.SrcFolder, mcu), extensions, true)
+		arch := buildProperties[constants.BUILD_PROPERTIES_BUILD_ARCH]
+		err := utils.FindFilesInFolder(&filePaths, filepath.Join(library.SrcFolder, arch), extensions, true)
 		if err != nil {
 			return nil, i18n.WrapError(err)
 		}
